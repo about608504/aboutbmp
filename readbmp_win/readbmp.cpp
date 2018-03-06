@@ -35,7 +35,7 @@ void showBmpInfoHead(tagBITMAPINFOHEADER pBmpInfoHead) {
 }
 
 int main() {
-    char strFile[LENGTH_NAME_BMP] = "/Users/bcy/lena.bmp";
+    char strFile[LENGTH_NAME_BMP] = "lena.bmp";
     IMAGEDATA *imagedata = NULL;
     IMAGEDATA *imagedataOut = NULL;
     int width;
@@ -51,6 +51,7 @@ int main() {
             cout << "The file is not bmp!" << endl;
             return 0;
         }
+
         fread(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fp);
         showBmpHead(strHead);
         fread(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fp);
@@ -63,6 +64,8 @@ int main() {
             fread((char *) & (strPalette[i].rgbRed), sizeof(BYTE), 1, fp);
             fread((char *) & (strPalette[i].rgbReserved), sizeof(BYTE), 1, fp);
         }
+        //int bbb = 254;
+        //printf("%d %d %d %d",strPalette[bbb].rgbBlue,strPalette[bbb].rgbGreen,strPalette[bbb].rgbRed,strPalette[bbb].rgbReserved);
 
         width = strInfo.biWidth;
         height = strInfo.biHeight;
