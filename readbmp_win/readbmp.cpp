@@ -72,6 +72,9 @@ int main() {
         //width = (width * sizeof(IMAGEDATA) + 3) /4 * 4;
         width  = ((width % 4 == 0  ? width : width + (4 - (width % 4))) * strInfo.biBitCount) / 8;
         imagedata = (IMAGEDATA *)malloc( width * height );
+        //printf("new width:%d",width);
+        //BYTE bcy = 1;
+        //printf("sizeof bcy:%d",sizeof(IMAGEDATA *));
         imagedataOut = (IMAGEDATA *)malloc( width * height * sizeof(imagedata));
 
         for(int j = 0; j < height; j++) {
@@ -82,7 +85,7 @@ int main() {
         }
 
         //读出图片的像素数据
-        fread(imagedata, sizeof(struct tagIMAGEDATA) * width, height, fp);
+        fread(imagedata, sizeof(IMAGEDATA) * width, height, fp);
         fclose(fp);
     } else {
         cout << "File open error!" << endl;
@@ -91,8 +94,14 @@ int main() {
 
     for(int j = 0; j < height; j++) {
         for(int i = 0 ; i < width; i++) {
-            *(imagedataOut + j * width + i) = *(imagedata + j * width + i);
+            *(imagedataOut + j * width + i) = *(imagedata + j * width + i);           
         }
+    }
+    for(int j = 0; j < 20; j++) {
+        for(int i = 0 ; i < 10; i++) {
+            printf("%d ",(*(imagedataOut + j * width + i)).blue);
+        }
+        printf("\n");
     }
 
     if( (fpo = fopen("out.bmp", "wb")) == NULL) {
