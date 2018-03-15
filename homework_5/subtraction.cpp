@@ -1,11 +1,14 @@
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/timeb.h>
+#include <time.h>
+#include <algorithm>
 #include "BITMAPINFO_1.h"
-
+struct timeb t1, t2; //计算程序运行时间
 using namespace std;
 
-#define LENGTH_NAME_BMP 100		//bmp file name 
+#define LENGTH_NAME_BMP 100     //bmp file name 
 
 BITMAPFILEHEADER strHead;
 BITMAPINFOHEADER strInfo;
@@ -13,6 +16,7 @@ BITMAPFILEHEADER strHead_1;
 BITMAPINFOHEADER strInfo_1;
 RGBQUAD strPalette[256];
 RGBQUAD strPalette_1[256];
+
 int main() {
     char strFile[LENGTH_NAME_BMP] = "lena.bmp";
     char strFile_1[LENGTH_NAME_BMP] = "lena_1.bmp";
@@ -30,7 +34,7 @@ int main() {
 
 
     if( fp != NULL ) {
-        WORD bfType;	//the type of the file
+        WORD bfType;    //the type of the file
         fread(&bfType, sizeof(WORD), 1, fp);
 
         if( 0x4d42 != bfType ) {
@@ -69,8 +73,6 @@ int main() {
         cout << "File1 open error!" << endl;
         return 0;
     }
-
-
 
     if( fp_1 != NULL ) {
         WORD bfType_1;  //the type of the file
@@ -114,48 +116,112 @@ int main() {
 
     for(int j = 0; j < height; j++) {
         for(int i = 0 ; i < width; i++) {
-            (*(imagedataOut + j * width + i)).blue = (*(imagedata_1 + j * width + i)).blue - (*(imagedata + j * width + i)).blue;
+            (*(imagedataOut + j * width + i)).blue = (*(imagedata + j * width + i)).blue - (*(imagedata_1 + j * width + i)).blue;
         }
     }
 
 
 
-
-    if( (fpo = fopen("out.bmp", "wb")) == NULL) {
-        cout << "Create the bmp file error!" << endl;
-        return 0;
-    }
-
-    WORD bfTypeOut = 0x4d42;
-    fwrite(&bfTypeOut, sizeof(WORD), 1, fpo);
-    fwrite(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpo);
-    strInfo.biHeight = height;
-    strInfo.biWidth = width;
-    fwrite(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpo);
-
-    //保存调色板数据
-    for(int i = 0 ; i < strInfo.biClrUsed; i++) {
-        fwrite(&strPalette[i].rgbBlue, sizeof(BYTE), 1, fpo);
-        fwrite(&strPalette[i].rgbGreen, sizeof(BYTE), 1, fpo);
-        fwrite(&strPalette[i].rgbRed, sizeof(BYTE), 1, fpo);
-        fwrite(&strPalette[i].rgbReserved, sizeof(BYTE), 1, fpo);
-    }
-
-    //保存像素数据
-    for(int j = 0; j < height; j++) {
-        for(int i = 0; i < width; i++) {
-            fwrite(&((*(imagedataOut + j * width + i)).blue), sizeof(BYTE), 1, fpo);
+    ftime(&t1);
+    for(int k = 0; k <= 1; k++) {
+        if( (fpo = fopen("out_2.bmp", "wb")) == NULL) {
+            free(imagedata);
+            free(imagedataOut);
+            cout << "Create the bmp file error!" << endl;
+            return 0;
         }
+
+        WORD bfTypeOut = 0x4d42;
+        fwrite(&bfTypeOut, sizeof(WORD), 1, fpo);
+        fwrite(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpo);
+        strInfo.biHeight = height;
+        strInfo.biWidth = width;
+        fwrite(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpo);
+
+        //保存调色板数据
+        for(int i = 0 ; i < strInfo.biClrUsed; i++) {
+            fwrite(&strPalette[i].rgbBlue, sizeof(BYTE), 1, fpo);
+            fwrite(&strPalette[i].rgbGreen, sizeof(BYTE), 1, fpo);
+            fwrite(&strPalette[i].rgbRed, sizeof(BYTE), 1, fpo);
+            fwrite(&strPalette[i].rgbReserved, sizeof(BYTE), 1, fpo);
+        }
+
+        //保存像素数据
+
+
+        for(int j = 0; j < height; j++) {
+            //for(int i = 0; i < width; i++) {
+            fwrite(&((*(imagedataOut + j * width)).blue), sizeof(BYTE)*width, 1, fpo);
+            //}
+        }
+        fclose(fpo);
     }
+    ftime(&t2);
+    cout << (t2.time - t1.time) * 1000 + (t2.millitm - t1.millitm) << "ms" << endl;
+
+
+    // ftime(&t1);
+    // for(int k = 0; k <= 5000; k++) {
+    //     if( (fpo = fopen("out_2.bmp", "wb")) == NULL) {
+    //         free(imagedata);
+    //         free(imagedataOut);
+    //         cout << "Create the bmp file error!" << endl;
+    //         return 0;
+    //     }
+
+    //     WORD bfTypeOut = 0x4d42;
+    //     fwrite(&bfTypeOut, sizeof(WORD), 1, fpo);
+    //     fwrite(&strHead, sizeof(tagBITMAPFILEHEADER), 1, fpo);
+    //     strInfo.biHeight = height;
+    //     strInfo.biWidth = width;
+    //     fwrite(&strInfo, sizeof(tagBITMAPINFOHEADER), 1, fpo);
+
+    //     //保存调色板数据
+    //     for(int i = 0 ; i < strInfo.biClrUsed; i++) {
+    //         fwrite(&strPalette[i].rgbBlue, sizeof(BYTE), 1, fpo);
+    //         fwrite(&strPalette[i].rgbGreen, sizeof(BYTE), 1, fpo);
+    //         fwrite(&strPalette[i].rgbRed, sizeof(BYTE), 1, fpo);
+    //         fwrite(&strPalette[i].rgbReserved, sizeof(BYTE), 1, fpo);
+    //     }
+
+    //     //保存像素数据
+
+
+    //     for(int j = 0; j < height; j++) {
+    //         for(int i = 0; i < width; i++) {
+    //             fwrite(&((*(imagedataOut + j * width + 1)).blue), sizeof(BYTE), 1, fpo);
+    //         }
+    //     }
+    //     fclose(fpo);
+    // }
+    // ftime(&t2);
+    // cout << (t2.time - t1.time) * 1000 + (t2.millitm - t1.millitm) << "ms" << endl;
 
 
 
-    //getchar();
 
-    fclose(fpo);
 
-    delete [] imagedata;
-    delete [] imagedataOut;
+
+    // ftime(&t1);
+    // for(int k = 0; k <= 1000; k++) {
+
+    //     for(int j = 0; j < height; j++) {
+    //         for(int i = 0; i < width; i++) {
+    //         fwrite(&((*(imagedataOut + j * width + i)).blue), sizeof(BYTE), 1, fpo);
+    //         }
+    //     }
+    // }
+    // ftime(&t2);
+    // cout << (t2.time - t1.time) * 1000 + (t2.millitm - t1.millitm) << "ms" << endl;
+
+
+
+
+    free(imagedata);
+    free(imagedataOut);
 
 }
+
+
+
 
