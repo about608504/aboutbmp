@@ -10,6 +10,8 @@ using namespace std;
 BITMAPFILEHEADER strHead;
 BITMAPINFOHEADER strInfo;
 RGBQUAD strPalette[256];
+int width;
+int height;
 
 void showBmpHead(BITMAPFILEHEADER pBmpHead) {
     cout << "the bitmap header file: " << endl;
@@ -34,12 +36,13 @@ void showBmpInfoHead(tagBITMAPINFOHEADER pBmpInfoHead) {
     cout << "important colors: " << pBmpInfoHead.biClrImportant << endl;
 }
 
+//void readbmp(char fp[],)
+
 int main() {
     char strFile[LENGTH_NAME_BMP] = "lena.bmp";
     IMAGEDATA *imagedata = NULL;
     IMAGEDATA *imagedataOut = NULL;
-    int width;
-    int height;
+
     FILE *fp, *fpo;
     fp = fopen(strFile, "rb");
 
@@ -109,10 +112,12 @@ int main() {
     int tempx = 0;
     int tempy = 0;
     int color[2][2];
+    double sinx = sin(hudu);
+    double cosx = cos(hudu);//提前算出来提高效率
     for(int j = 0; j < height; j++) {
         for(int i = 0 ; i < width; i++) {
-            kx = (i * xyinzi - nwidth / 2) * cos(hudu) + (j * yyinzi - nheight / 2) * sin(hudu) + 128;
-            ky = -(i * xyinzi - nwidth / 2) * sin(hudu) + (j * yyinzi - nheight / 2) * cos(hudu) + 128;
+            kx = (i * xyinzi - nwidth / 2) * cosx + (j * yyinzi - nheight / 2) * sinx + 128;
+            ky = -(i * xyinzi - nwidth / 2) * sinx + (j * yyinzi - nheight / 2) * cosx + 128;
             if((kx >= 0) && (ky >= 0) && (kx < width) && (ky < height)) {
                 tempx = (int) kx;
                 ox = kx - tempx;
@@ -154,9 +159,7 @@ int main() {
 
     //保存像素数据
     for(int j = 0; j < height; j++) {
-        for(int i = 0; i < width; i++) {
-            fwrite(&((*(imagedataOut + j * width + i)).blue), sizeof(BYTE), 1, fpo);
-        }
+        fwrite(&((*(imagedataOut + j * width)).blue), sizeof(BYTE), 1, fpo);
     }
 
     //getchar();
