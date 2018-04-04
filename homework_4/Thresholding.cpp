@@ -86,13 +86,6 @@ int main() {
         return 0;
     }
     
-    for (int i = 0; i < 10; ++i) {
-        for (int j = 0; j < 20; ++j) {
-            int bcy = (*(imagedata + j * width + i)).blue;
-            printf("%d ",bcy);
-        }
-        printf("\n");
-    }
     int value;
     printf("Threshold: ");
     scanf("%d",&value);
