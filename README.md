@@ -26,7 +26,3 @@ https://blog.csdn.net/xieyan0811/article/details/71106539
 win下运行正常。  
 i,j为直角坐标系图像左下角为原点。  
 图像数值255为白色，0为黑色。 
-
-
-
-?
